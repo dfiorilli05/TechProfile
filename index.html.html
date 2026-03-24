@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Summary</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .dashboard {
+    width: 1280px;
+    height: 720px;
+    background: #e8e8e8;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 52px;
+    background: #7a1c2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+    gap: 28px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .sidebar-icon:hover { color: #fff; }
+  .sidebar-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: #7a1c2e;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .header h1 {
+    color: #fff;
+    font-size: 1.55rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  .header .logo {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+  }
+
+  /* Logo SVG */
+  .logo-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* CONTENT */
+  .content {
+    flex: 1;
+    padding: 14px 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #dcdcdc;
+  }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .kpi-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    min-height: 72px;
+  }
+
+  .kpi-value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #222;
+    line-height: 1;
+  }
+
+  .kpi-label {
+    font-size: 0.72rem;
+    color: #666;
+    margin-top: 5px;
+    text-align: center;
+  }
+
+  /* CHARTS ROW */
+  .charts-row {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  /* LEFT — bar chart full height */
+  .chart-card {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chart-header {
+    background: #7a1c2e;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .chart-body {
+    flex: 1;
+    padding: 10px 12px 8px 8px;
+    position: relative;
+    min-height: 0;
+  }
+
+  .chart-body canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* RIGHT — two stacked charts */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .right-col .chart-card {
+    flex: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- Home -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </div>
+    <!-- Filter -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A1 1 0 0 0 18.95 4H5.04a1 1 0 0 0-.79 1.61z"/></svg>
+    </div>
+    <!-- People -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+    </div>
+    <!-- Chart -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+    </div>
+    <!-- Database -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 4.02 2 6.5v11C2 19.98 6.48 22 12 22s10-2.02 10-4.5v-11C22 4.02 17.52 2 12 2zm0 2c4.42 0 8 1.57 8 3.5S16.42 11 12 11 4 9.43 4 7.5 7.58 4 12 4zm0 16c-4.42 0-8-1.57-8-3.5v-2.13c1.72 1.02 4.71 1.63 8 1.63s6.28-.61 8-1.63V16.5c0 1.93-3.58 3.5-8 3.5zm0-5c-4.42 0-8-1.57-8-3.5v-2.13c1.72 1.02 4.71 1.63 8 1.63s6.28-.61 8-1.63V11.5c0 1.93-3.58 3.5-8 3.5z"/></svg>
+    </div>
+    <!-- Table -->
+    <div class="sidebar-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v2H3zm0 4h18v2H3zm0 4h18v2H3zm0 4h18v2H3zm0 4h18v2H3z"/></svg>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h1>Executive Summary</h1>
+      <div class="logo">
+        <div class="logo-circle">
+          <svg viewBox="0 0 52 52" width="52" height="52" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="26" fill="#fff"/>
+            <!-- Star burst -->
+            <g transform="translate(26,18)">
+              <line x1="0" y1="-10" x2="0" y2="10" stroke="#7a1c2e" stroke-width="1.5"/>
+              <line x1="-10" y1="0" x2="10" y2="0" stroke="#7a1c2e" stroke-width="1.5"/>
+              <line x1="-7" y1="-7" x2="7" y2="7" stroke="#7a1c2e" stroke-width="1.2"/>
+              <line x1="7" y1="-7" x2="-7" y2="7" stroke="#7a1c2e" stroke-width="1.2"/>
+              <circle cx="0" cy="0" r="2.5" fill="#7a1c2e"/>
+            </g>
+            <!-- Text lines -->
+            <rect x="10" y="32" width="32" height="2" rx="1" fill="#7a1c2e" opacity="0.6"/>
+            <rect x="14" y="36" width="24" height="2" rx="1" fill="#7a1c2e" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-value">3.9</div>
+          <div class="kpi-label">365 Adoption Score (out of 4)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">89%</div>
+          <div class="kpi-label">Teams Adoption Rate</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">19%</div>
+          <div class="kpi-label">Yammer Adoption Rate</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">341</div>
+          <div class="kpi-label">Using Collaboration Tools</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-row">
+
+        <!-- LEFT: Digital Maturity Index bar chart -->
+        <div class="chart-card">
+          <div class="chart-header">Digital Maturity Index</div>
+          <div class="chart-body">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+
+        <!-- RIGHT: two charts stacked -->
+        <div class="right-col">
+
+          <!-- Teams Utilization donut -->
+          <div class="chart-card">
+            <div class="chart-header">Teams Utilization</div>
+            <div class="chart-body" style="display:flex; align-items:center; justify-content:center; padding:10px 16px;">
+              <canvas id="donutChart" style="max-width:160px; max-height:160px;"></canvas>
+              <div style="margin-left:24px; font-size:0.7rem; color:#333; line-height:1.8;">
+                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;background:#4caf50;border-radius:2px;"></span> Teams Active Users</div>
+                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;background:#1a237e;border-radius:2px;"></span> Teams Never Active</div>
+                <div style="margin-top:8px; font-size:0.68rem; color:#555;">342 (87.92%)</div>
+                <div style="font-size:0.68rem; color:#555;">47 (12.08%)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Software Used by Type pie -->
+          <div class="chart-card">
+            <div class="chart-header">Software Used by Type</div>
+            <div class="chart-body" style="display:flex; align-items:center; justify-content:center; padding:8px 14px;">
+              <canvas id="pieChart" style="max-width:150px; max-height:150px;"></canvas>
+              <div style="margin-left:18px; font-size:0.66rem; color:#333; line-height:1.9;">
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:11px;height:11px;background:#4caf50;border-radius:2px;"></span> Workplace Productivity</div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:11px;height:11px;background:#1a237e;border-radius:2px;"></span> Content &amp; Media</div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:11px;height:11px;background:#c9a800;border-radius:2px;"></span> Collaboration &amp; Com...</div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:11px;height:11px;background:#8b0000;border-radius:2px;"></span> Data &amp; Insights</div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:11px;height:11px;background:#1e88e5;border-radius:2px;"></span> Work Management</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── BAR CHART ──────────────────────────────────────────────
+const barCtx = document.getElementById('barChart').getContext('2d');
+const barLabels = [
+  'Regions','Executive Office','Health Systems & Hos...',
+  'Strategy & Innovations','Education','Community Engagem...',
+  'Employment and Job P...','LTC, CBO & Pharmacy',
+  'Healthcare Education ...','Operations',
+  'Member Resources','External Affairs'
+];
+const barValues = [85,81,77,71,68,66,66,63,61,60,59,56];
+const barColors = barValues.map(v => v >= 70 ? '#4caf50' : '#e65100');
+
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: barLabels,
+    datasets: [{
+      data: barValues,
+      backgroundColor: barColors,
+      borderRadius: 2,
+      barThickness: 16,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.x}`
+        }
+      },
+      datalabels: false
+    },
+    scales: {
+      x: {
+        min: 0, max: 100,
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        ticks: { font: { size: 10 }, color: '#555' }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { font: { size: 10 }, color: '#333' }
+      }
+    },
+    // draw value labels on bars
+    animation: {
+      onComplete: function() {
+        const chart = this;
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((bar, index) => {
+            const val = dataset.data[index];
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Segoe UI, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(val, bar.x - 4, bar.y);
+          });
+        });
+      }
+    }
+  }
+});
+
+// ── DONUT CHART ────────────────────────────────────────────
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Teams Active Users','Teams Never Active'],
+    datasets: [{
+      data: [342, 47],
+      backgroundColor: ['#4caf50','#1a237e'],
+      borderWidth: 0,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '65%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.parsed} (${((ctx.parsed/389)*100).toFixed(1)}%)`
+        }
+      }
+    }
+  }
+});
+
+// ── PIE CHART ──────────────────────────────────────────────
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'pie',
+  data: {
+    labels: [
+      'Workplace Productivity','Content & Media',
+      'Collaboration & Com.','Data & Insights',
+      'Work Management','Other A','Other B'
+    ],
+    datasets: [{
+      data: [16, 8, 7, 7, 5, 3, 3],
+      backgroundColor: [
+        '#4caf50','#1a237e','#c9a800',
+        '#8b0000','#1e88e5','#546e7a','#bf360c'
+      ],
+      borderWidth: 1,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed/49*100)}%)`
+        }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
